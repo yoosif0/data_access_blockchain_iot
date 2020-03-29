@@ -1,0 +1,9 @@
+{
+    "extends": "react-app",
+    "globals": {
+        "before": "readonly",
+        "contract": "readonly",
+        "artifacts": "readonly",
+        "assert": "readonly"
+    }
+}
