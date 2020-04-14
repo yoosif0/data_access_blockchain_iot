@@ -1,0 +1,6 @@
+export const userType = {
+    OWNER: 'OWNER',
+    USER_WITH_ACCESS: 'USER_WITH_ACCESS',
+    USER_WITHOUT_ACCESS: 'USER_WITHOUT_ACCESS',
+    UNKOWN: 'UNKOWN',
+}

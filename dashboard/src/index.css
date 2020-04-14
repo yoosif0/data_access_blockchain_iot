@@ -1,0 +1,12 @@
+.table{
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+.mt-10{
+    margin-top: 10px;
+}
+
+.fa {
+    cursor: pointer;
+}

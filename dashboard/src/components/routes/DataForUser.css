@@ -1,0 +1,14 @@
+
+.secret-block{
+    width: 1000px;
+    height: 159px;
+    background: lightgray;
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+}
+
+.secret-block .btn-link{
+    margin-left: auto;
+    display: block;
+}
