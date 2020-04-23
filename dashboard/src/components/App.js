@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import { UsersListing } from './routes/UsersListing';
 import { connect } from 'react-redux';
 import Web3 from 'web3';
-import DataAccess from '../DataAccess'
+import DataAccess from '../../../blockchain/src/abis/DataAccess.json'
 import { Navbar } from './layout/Navbar'
 import { initiate } from '../actions';
 import { ErrorModal } from './core/ErrorModal';

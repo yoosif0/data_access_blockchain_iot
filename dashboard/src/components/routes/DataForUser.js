@@ -6,13 +6,6 @@ import './DataForUser.css';
 import { ModalCLoseButton } from "../core/ModalCloseButton";
 
 
-// const calculateMyEncryptedSecretKey = (users) => {
-//   Object.keys(users).forEach(async publicKey => {
-//     if (users[publicKey].identity === 'OWNER') {
-//       return users[publicKey].encryptedSecretKey
-//     }
-//   })
-// }
 const mapStateToProps = state => ({
   dataHash: state.documentStore.dataHash,
   myAccountAddress: state.ethStore.account,

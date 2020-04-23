@@ -18,7 +18,7 @@ contract DataAccess{
         secretObjectHash = a;
     }
 
-    function getDataHash () public isOwner() view  returns(string memory) {
+    function getDataHash () public view  returns(string memory) {
         return dataHash;
     }
 

@@ -6,13 +6,19 @@ import { PageContentLayout } from '../layout/PageContentLayout';
 import Modal from 'react-modal';
 import { addUser, giveAccess, revokeAccess } from '../../actions';
 import { ModalCLoseButton } from '../core/ModalCloseButton';
+import { encryptASymmtrically } from '../../services/encryption';
 
 
-const mapStateToProps = state => ({ users: state.usersStore.items, contract: state.ethStore.deployedContract, myAccountAddress: state.ethStore.account })
+const mapStateToProps = state => ({ 
+    users: state.usersStore.items,
+     contract: state.ethStore.deployedContract,
+      myAccountAddress: state.ethStore.account
+    
+    })
 const mapDispatchToProps = dispatch => ({
     addUser: (contract, pubkey, myAccountAddress, users) => dispatch(addUser(contract, pubkey, myAccountAddress, users)),
-    grant: (contract, pubkey, myAccountAddress, users, secret) => dispatch(giveAccess(contract, pubkey, myAccountAddress, users, secret)),
-    revoke: (contract, pubkey, myAccountAddress, users) => dispatch(revokeAccess(contract, pubkey, myAccountAddress)),
+    grant: (contract, pubkey, myAccountAddress, users, encryptedSecretKey) => dispatch(giveAccess(contract, pubkey, myAccountAddress, users, encryptedSecretKey)),
+    revoke: (contract, pubkey, myAccountAddress, users) => dispatch(revokeAccess(contract, pubkey, myAccountAddress, users)),
 })
 
 const customStyles = {
@@ -53,6 +59,12 @@ export class PUsersListing extends React.Component {
         this.setState({ input: e.target.value });
     }
 
+    async giveAccess() {
+        const encryptedSecretKey = await encryptASymmtrically(this.state.selecetedUserPublicKey, this.state.input)
+        this.props.grant(this.props.contract, this.state.selecetedUserPublicKey, this.props.myAccountAddress, this.props.users, encryptedSecretKey)
+    }
+    
+
 
     render() {
         return (
@@ -74,7 +86,7 @@ export class PUsersListing extends React.Component {
                     </form>
                     { this.state.isAddingUser ? 
                         <button className="btn btn-warning mt-10" onClick={ () => this.props.addUser(this.props.contract, this.state.input, this.props.myAccountAddress, this.props.users)}>Add</button> :
-                        <button className="btn btn-warning mt-10" onClick={ () => this.props.grant(this.props.contract, this.state.selecetedUserPublicKey, this.props.myAccountAddress, this.props.users, this.state.input)}>Give Access</button>    
+                        <button className="btn btn-warning mt-10" onClick={ async () => await this.giveAccess()}>Give Access</button>    
                 }
                 </Modal>
                 <PageContentLayout isRendering={Object.keys(this.props.users).length} unAvailabilityText="No users">

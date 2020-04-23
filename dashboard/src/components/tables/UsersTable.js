@@ -1,5 +1,6 @@
 import React from 'react'
 import { TableLayout } from './TableLayout';
+import { publicToAddress } from '../../services/ethUtils'
 
 export const UsersTable = ({ users, onGrantClick, onRevokeClick }) => (
 
@@ -21,7 +22,7 @@ export const UsersTable = ({ users, onGrantClick, onRevokeClick }) => (
                     
                 }>
                     <td>{pubKey}</td>
-                    <td>{users[pubKey].address}</td>
+                    <td>{publicToAddress(pubKey)  }</td>
 
 
                     <td>

@@ -1,5 +1,4 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { publicToAddress } from '../services/ethUtils'
 
 const initialState = {
     items: {},
@@ -14,20 +13,7 @@ export const usersStore = createReducer(initialState, {
         state.items[action.pubKey].haveAccess = false
     },
     SAVE_USERS: (state, action) => {
-        const newObj = {}
-        Object.keys(action.payload).forEach(publicKey => {
-            newObj[publicKey] = {...action.payload[publicKey], address: publicToAddress(publicKey)}
-        })
-        state.items = newObj
-        if (action.myAccountAddress) {
-            console.log()
-            Object.keys(state.items).forEach(pubKey=> {
-                if(state.items[pubKey].address === action.myAccountAddress) {
-                    console.log('yeaaaaaaaaah')
-                    state.myEncryptedSecretKey = state.items[pubKey].encryptedSecretKey
-                }
-            })
-        }
+        state.items = action.payload
     },
     STORE_ENCRYPTED_SECRET_KEY: (state, action) => {
         state.myEncryptedSecretKey = action.payload
