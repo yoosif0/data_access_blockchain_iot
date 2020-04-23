@@ -7,76 +7,77 @@ const ipfs = IpfsHttpClient({ host: 'ipfs.infura.io', port: '5001', protocol: 'h
 
 export function initiate(deployedContract, account) {
     return async function (dispatch) {
-        dispatch({ type: 'SET_ETH_STATE', payload: { deployedContract, account } })
-        dispatch(getDataHash(deployedContract))
-        dispatch(getSecretObjectHash(deployedContract, account))
+        dispatch({ type: 'SET_SET_MY_ACCOUNT_ADDRESS', payload: account })
+        dispatch({ type: 'SET_DEPLOYED_CONTRACT', payload: deployedContract })
+        dispatch(getUsersHash(deployedContract, account))
     };
 }
 
-export function addUser(deployedContract, userPubKey, myAccountAddress, secretObject) {
-    const updated = Object.assign({}, secretObject)
+export function addUser(deployedContract, userPubKey, myAccountAddress, users) {
+    const updated = Object.assign({}, users)
     updated[userPubKey] = { haveAccess: false, encryptedSecretKey: undefined }
     return saveUsers(deployedContract, myAccountAddress, updated)
 }
 
 
-export function  giveAccess(deployedContract, userPubKey, myAccountAddress, secretObject, encryptedSecretKey) {
-    const updated = Object.assign({}, secretObject)
+export function  giveAccess(deployedContract, userPubKey, myAccountAddress, users, encryptedSecretKey) {
+    const updated = Object.assign({}, users)
     updated[userPubKey] = { haveAccess: true, encryptedSecretKey }
     return saveUsers(deployedContract, myAccountAddress, updated)
 }
 
-export function revokeAccess(deployedContract, userPubKey, myAccountAddress, secretObject) {
-    const updated = Object.assign({}, secretObject)
+export function revokeAccess(deployedContract, userPubKey, myAccountAddress, users) {
+    const updated = Object.assign({}, users)
     updated[userPubKey] = { haveAccess: false, encryptedSecretKey: undefined }
     return saveUsers(deployedContract, myAccountAddress, updated)
 }
 
-function saveUsers(deployedContract, myAccountAddress, secretObject) {
+function saveUsers(deployedContract, myAccountAddress, users) {
     return async function (dispatch) {
         try {
-            const res = await ipfs.object.put({ Data: JSON.stringify(secretObject), Links: [] })
-            await storeSecretObjectHashInBlockchain(deployedContract, myAccountAddress, res.toString())
-            return dispatch({ type: 'SAVE_USERS', payload: secretObject, myAccountAddress: myAccountAddress })
+            const res = await ipfs.object.put({ Data: JSON.stringify(users), Links: [] }).catch(e => dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t save users in IPFS' }))
+            await storeUsersHashInBlockchain(deployedContract, myAccountAddress, res.toString()).catch(e => dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t store users hash in the blockchain' }))
+            return dispatch({ type: 'SAVE_USERS', payload: users, myAccountAddress: myAccountAddress })
         } catch (e) {
-            return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t revoke access from a user. Make sure you are the owner of the contract' })
+            console.log(e) 
         }
     };
 }
 
-async function storeSecretObjectHashInBlockchain(contract, myAccountAddress, secretObjectHash) {
-    const gasAmount = await contract.methods.storeSecretObjectHash(secretObjectHash).estimateGas({ from: myAccountAddress })
-    return contract.methods.storeSecretObjectHash(secretObjectHash).send({ gas: gasAmount, from: myAccountAddress })
+async function storeUsersHashInBlockchain(contract, myAccountAddress, usersHash) {
+    const gasAmount = await contract.methods.storeUsersHash(usersHash).estimateGas({ from: myAccountAddress })
+    return contract.methods.storeUsersHash(usersHash).send({ gas: gasAmount, from: myAccountAddress })
 }
 
 
-function getDataHash(deployedContract) {
+export function getData(deployedContract) {
     return async function (dispatch) {
         try {
             const hash = await deployedContract.methods.getDataHash().call()
-            if (hash) {
-                dispatch({ type: 'STORE_FILE_HASH', hash })
+            if (!hash) {
+                dispatch({ type: 'OPEN_ERROR_MODAL', message: 'data hash is empty. Are you sure you ran the iot device' })
+            } else {
+                const r = await ipfs.object.get(hash)
+                const data = JSON.parse(r._data.toString())
+                console.log(data)
+                return dispatch({type: 'STORE_DATA', payload: data})
             }
         } catch (e) {
-            return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t get your document\'s hash' })
+            return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t get your data\'s hash' })
         }
     };
 }
 
-function getSecretObjectHash(deployedContract, myAccountAddress) {
+function getUsersHash(deployedContract, myAccountAddress) {
     return async function (dispatch) {
         try {
-            const hash = await deployedContract.methods.getSecretObjectHash().call()
-            if (hash) {
-                dispatch({ type: 'STORE_SECRET_OBJECT_HASH', hash })
-            } else {
-                return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Secret hash is empty. Maybe you have never started your IoT device yet' })
+            const hash = await deployedContract.methods.getUsersHash().call()
+            if (!hash) {
+                return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'users hash is empty. Maybe you have never started your IoT device yet' })
             }
             try {
-                console.log('hash', hash)
                 const r = await ipfs.object.get(hash)
                 const users = JSON.parse(r._data.toString())
-                console.log(users)
                 dispatch({ type: 'SAVE_USERS', payload: users })
 
                 Object.keys(users).forEach(key => {
@@ -91,7 +92,7 @@ function getSecretObjectHash(deployedContract, myAccountAddress) {
             }
 
         } catch (e) {
-            return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t call getSecretObjectHash in the contract. Maybe you have never started your IoT device yet' })
+            return dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Can\'t call getUsersHash in the contract. Maybe you have never started your IoT device yet' })
         }
     }
 }

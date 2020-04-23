@@ -1,11 +1,11 @@
 import { createReducer } from '@reduxjs/toolkit'
 
 const initialState = {
-    dataHash: undefined,
+    data: [],
 }
 
 export const dataStore = createReducer(initialState, {
-    STORE_FILE_HASH: (state, action) => {
-        state.dataHash = action.hash
+    STORE_DATA: (state, action) => {
+        state.data = action.payload
     },
 })

@@ -2,7 +2,6 @@ import { createReducer } from '@reduxjs/toolkit'
 
 const initialState = {
     items: {},
-    myEncryptedSecretKey: undefined
 }
 
 export const usersStore = createReducer(initialState, {
@@ -15,8 +14,4 @@ export const usersStore = createReducer(initialState, {
     SAVE_USERS: (state, action) => {
         state.items = action.payload
     },
-    STORE_ENCRYPTED_SECRET_KEY: (state, action) => {
-        state.myEncryptedSecretKey = action.payload
-    },
-
 })

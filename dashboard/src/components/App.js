@@ -13,7 +13,7 @@ import { DataForUserPage } from './routes/DataForUser';
 
 
 
-const mapStateToProps = state => ({ account: state.ethStore.account })
+const mapStateToProps = state => ({ account: state.identityStore.myAccountAddress })
 const mapDispatchToProps = dispatch => ({
   saveAccounts: (payload) => dispatch({ type: 'SAVE_ACCOUNT', payload }),
   initiate: (deployedContract, account) => dispatch(initiate(deployedContract, account)),

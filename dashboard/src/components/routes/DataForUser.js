@@ -1,22 +1,22 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
 import Modal from 'react-modal';
-import { getData } from "../../services/file.service";
+import { getData } from "../../actions/index";
 import './DataForUser.css';
 import { ModalCLoseButton } from "../core/ModalCloseButton";
+import { decryptSymmtrically } from "../../services/encryption";
+import { DataTable } from "../tables/DataTable";
 
 
 const mapStateToProps = state => ({
-  dataHash: state.documentStore.dataHash,
-  myAccountAddress: state.ethStore.account,
-  myEncryptedSecretKey: state.usersStore.myEncryptedSecretKey,
-  users: state.usersStore.items,
+  data: state.dataStore.data,
+  contract: state.ethStore.deployedContract,
+  myAccountAddress: state.identityStore.myAccountAddress,
+  myEncryptedSecretKey: state.identityStore.myEncryptedSecretKey,
 })
 const mapDispatchToProps = dispatch => ({
-  openErrorMoadalForWrongSecretKey: () => dispatch({
-    type: 'OPEN_ERROR_MODAL',
-    message: 'Wrong secret key'
-  })
+  openErrorMoadalForWrongSecretKey: () => dispatch({ type: 'OPEN_ERROR_MODAL', message: 'Wrong secret key' }),
+  initiate: (c) => dispatch(getData(c))
 })
 
 const customStyles = {
@@ -33,10 +33,14 @@ const customStyles = {
 export class PDataForUserPage extends Component {
 
   state = {
-    // myEncryptedSecretKey: calculateMyEncryptedSecretKey(this.props.users),
     modalIsOpen: false,
-    input: '',
+    secretKeyInput: '',
+    data: []
   };
+
+  componentDidMount() {
+    this.props.initiate(this.props.contract)
+  }
 
   openModal = () => {
     this.setState({ modalIsOpen: true })
@@ -47,17 +51,24 @@ export class PDataForUserPage extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({ input: e.target.value });
+    this.setState({ secretKeyInput: e.target.value });
   }
 
-  downloadData = async () => {
-    try {
-      await getData(this.props.dataHash, this.state.input)
-    } catch (e) {
-      this.closeModal()
-      this.props.openErrorMoadalForWrongSecretKey()
-    }
-
+  decrypt = () => {
+    const data = this.props.data.map(encryptedString => {
+      try {
+        const decrypted = decryptSymmtrically(encryptedString, this.state.secretKeyInput)
+        const parsed = JSON.parse(decrypted)
+        console.log(parsed)
+        const finalObject = { ...parsed, date: (new Date(parseInt(parsed.date.replace(/,/g, '')))).toISOString() }
+        console.log(finalObject)
+        return finalObject
+      } catch (e) {
+        return {}
+      }
+    })
+    console.log(data)
+    this.setState({ data })
   }
 
   render() {
@@ -77,33 +88,31 @@ export class PDataForUserPage extends Component {
               <input name="decryptedSecret" className="form-control" onChange={this.handleChange} placeholder="Enter decrypted secret" />
             </div>
           </form>
-          <button className="btn btn-warning" onClick={this.downloadData}>GetData</button>
+          <button className="btn btn-warning" onClick={this.decrypt}>Decrypt</button>
 
         </Modal>
 
 
         <div className="row">
           <main>
-            <div>
-              {this.props.dataHash ? 'Owner\'s document URL:    https://ipfs.infura.io/ipfs/' + this.props.dataHash : 'No files are saved for the user'}
-            </div>
-            <div>
-              {this.props.secretObjectHash && 'Secret Object URL:    https://ipfs.infura.io/ipfs/' + this.props.secretObjectHash}
-            </div>
-
-
             {
               this.props.myEncryptedSecretKey &&
               <div className="secret-block mt-10">
-                <button className="btn btn-link" onClick={() => { navigator.clipboard.writeText(this.props.myEncryptedSecretKey) }}>Copy</button>
+                <button className="btn btn-link" onClick={() => { navigator.clipboard.writeText(JSON.stringify(this.props.myEncryptedSecretKey)) }}>Copy</button>
                 <div className="body mt-10">
-                  {this.props.myEncryptedSecretKey}
+                  {JSON.stringify(this.props.myEncryptedSecretKey)}
                 </div>
               </div>
             }
 
             <div>
-              <button onClick={this.openModal} className="btn btn-warning mt-10">Get Data</button>
+              <button onClick={this.openModal} className="btn btn-warning mt-10">Decrypt symmetrically using the secret key</button>
+            </div>
+
+            <div>
+              {
+                this.state.data && !!this.state.data.length && <DataTable data={this.state.data} />
+              }
             </div>
 
           </main>

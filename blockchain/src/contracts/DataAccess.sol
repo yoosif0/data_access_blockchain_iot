@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 contract DataAccess{
     address private owner = msg.sender;
     string private dataHash;
-    string private secretObjectHash;
+    string private usersHash;
 
     function amIOwner() public view returns(bool) {
         return msg.sender == owner;
@@ -14,16 +14,16 @@ contract DataAccess{
         dataHash = a;
     }
 
-    function storeSecretObjectHash ( string memory a )  public isOwner(){
-        secretObjectHash = a;
+    function storeUsersHash ( string memory a )  public isOwner(){
+        usersHash = a;
     }
 
     function getDataHash () public view  returns(string memory) {
         return dataHash;
     }
 
-    function getSecretObjectHash () public view  returns(string memory) {
-        return secretObjectHash;
+    function getUsersHash () public view  returns(string memory) {
+        return usersHash;
     }
 
     modifier isOwner() {

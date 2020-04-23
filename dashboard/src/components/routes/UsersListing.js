@@ -9,12 +9,11 @@ import { ModalCLoseButton } from '../core/ModalCloseButton';
 import { encryptASymmtrically } from '../../services/encryption';
 
 
-const mapStateToProps = state => ({ 
+const mapStateToProps = state => ({
     users: state.usersStore.items,
-     contract: state.ethStore.deployedContract,
-      myAccountAddress: state.ethStore.account
-    
-    })
+    contract: state.ethStore.deployedContract,
+    myAccountAddress: state.identityStore.myAccountAddress
+})
 const mapDispatchToProps = dispatch => ({
     addUser: (contract, pubkey, myAccountAddress, users) => dispatch(addUser(contract, pubkey, myAccountAddress, users)),
     grant: (contract, pubkey, myAccountAddress, users, encryptedSecretKey) => dispatch(giveAccess(contract, pubkey, myAccountAddress, users, encryptedSecretKey)),
@@ -55,7 +54,7 @@ export class PUsersListing extends React.Component {
         this.setState({ modalIsOpen: false, input: '', selecetedUserPublicKey: '' })
     }
 
-    handleChange = (e) =>  {
+    handleChange = (e) => {
         this.setState({ input: e.target.value });
     }
 
@@ -63,17 +62,17 @@ export class PUsersListing extends React.Component {
         const encryptedSecretKey = await encryptASymmtrically(this.state.selecetedUserPublicKey, this.state.input)
         this.props.grant(this.props.contract, this.state.selecetedUserPublicKey, this.props.myAccountAddress, this.props.users, encryptedSecretKey)
     }
-    
+
 
 
     render() {
         return (
             <React.Fragment>
                 <Title> Users </Title>
-                <div> 
-                <button className="btn btn-warning" onClick={this.openModalToAddUser}>Add user</button>
+                <div>
+                    <button className="btn btn-warning" onClick={this.openModalToAddUser}>Add user</button>
                 </div>
-                
+
                 <Modal
                     isOpen={this.state.modalIsOpen}
                     onRequestClose={this.closeModal}
@@ -82,16 +81,16 @@ export class PUsersListing extends React.Component {
                 >
                     <ModalCLoseButton onClick={this.closeModal} />
                     <form className="mt-10">
-                    <input className="form-control" onChange={ this.handleChange } placeholder={ this.state.isAddingUser  ? "Enter user's public key" : 'Enter secret'}/> 
+                        <input className="form-control" onChange={this.handleChange} placeholder={this.state.isAddingUser ? "Enter user's public key" : 'Enter secret'} />
                     </form>
-                    { this.state.isAddingUser ? 
-                        <button className="btn btn-warning mt-10" onClick={ () => this.props.addUser(this.props.contract, this.state.input, this.props.myAccountAddress, this.props.users)}>Add</button> :
-                        <button className="btn btn-warning mt-10" onClick={ async () => await this.giveAccess()}>Give Access</button>    
-                }
+                    {this.state.isAddingUser ?
+                        <button className="btn btn-warning mt-10" onClick={() => this.props.addUser(this.props.contract, this.state.input, this.props.myAccountAddress, this.props.users)}>Add</button> :
+                        <button className="btn btn-warning mt-10" onClick={async () => await this.giveAccess()}>Give Access</button>
+                    }
                 </Modal>
                 <PageContentLayout isRendering={Object.keys(this.props.users).length} unAvailabilityText="No users">
 
-                    <UsersTable users={this.props.users} onGrantClick={ (userPubKey) => this.openModalToGrantAccess(userPubKey)  }  onRevokeClick={ (userPubKey) => this.props.revoke(this.props.contract, userPubKey, this.props.myAccountAddress, this.props.users)} />
+                    <UsersTable users={this.props.users} onGrantClick={(userPubKey) => this.openModalToGrantAccess(userPubKey)} onRevokeClick={(userPubKey) => this.props.revoke(this.props.contract, userPubKey, this.props.myAccountAddress, this.props.users)} />
 
                 </PageContentLayout>
 

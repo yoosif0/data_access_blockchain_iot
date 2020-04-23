@@ -38,10 +38,10 @@ export const PNavbar = ({ account, identity }) => (
         {identity === userType.OWNER ? (
           <React.Fragment>
             <NavBarLink to="/users" label="Users" />
-            <NavBarLink to="/document" label="My Data" />
+            <NavBarLink to="/dataForUser" label="My Data" />
           </React.Fragment>
         ) : identity === userType.USER_WITH_ACCESS ? (
-          <NavBarLink to="/documentForUser" label="Owner's Data" />
+          <NavBarLink to="/dataForUser" label="Owner's Data" />
           ) : <div></div>
           
           }
