@@ -38,18 +38,17 @@ async function initiate() {
     if (networkData) {
         contract = new web3.eth.Contract(DataAccess.abi, networkData.address);
         myAccountAddress = accounts[0]
-        dealWithSecretObjectPromise = dealWithSecretObject()
+        dealWithUsersPromise = dealWithUsers()
         dealWithDataPromise = dealWithData()
         
-
-        await dealWithSecretObjectPromise
+        await dealWithUsersPromise
         await dealWithDataPromise
     } else {
         console.warn('Contract is not found in your blockchain.')
     }
 }
 
-async function dealWithSecretObject() {
+async function dealWithUsers() {
     try {
         usersHash = await contract.methods.getUsersHash().call()
         console.log('usersHash', usersHash)

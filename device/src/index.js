@@ -1,4 +1,4 @@
-const {initiate, addNewDataPoint, getAllData} = require('./ipfs');
+const {initiate, addNewDataPoint} = require('./storage');
 
 (async function (){
     await initiate()
@@ -10,9 +10,4 @@ const {initiate, addNewDataPoint, getAllData} = require('./ipfs');
         }
         await addNewDataPoint(obj)
     }, 3000)
-
-    // setTimeout(async ()=>{
-    //     const allData = await getAllData()
-    //     console.log(allData)
-    // }, 4000)
 })()
