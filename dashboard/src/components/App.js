@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
-import { UsersListing } from './routes/UsersListing';
+import { UsersListingPage } from './routes/UsersListingPage';
 import { connect } from 'react-redux';
 import Web3 from 'web3';
 import DataAccess from '../../../blockchain/src/abis/DataAccess.json'
@@ -9,7 +9,7 @@ import { Navbar } from './layout/Navbar'
 import { initiate } from '../actions';
 import { ErrorModal } from './core/ErrorModal';
 import { IdentityPage } from './routes/IdentityPage';
-import { DataForUserPage } from './routes/DataForUser';
+import { DataPage } from './routes/DataPage';
 
 
 
@@ -63,10 +63,10 @@ class Appa extends Component {
         <div>
         </div>
         <div className="container">
-        <Route path="/users" component={UsersListing} />
+        <Route path="/users" component={UsersListingPage} />
         {/* <Route path="/document" component={DataPage} /> */}
         <Route path="/identity" component={IdentityPage} />
-        <Route path="/dataForUser" component={DataForUserPage} />
+        <Route path="/dataForUser" component={DataPage} />
         <Route path='/'>
           <Redirect to="/identity" />
         </Route>

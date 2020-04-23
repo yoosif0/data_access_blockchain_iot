@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import Modal from 'react-modal';
 import { getData } from "../../actions/index";
-import './DataForUser.css';
+import './DataPage.css';
 import { ModalCLoseButton } from "../core/ModalCloseButton";
 import { decryptSymmtrically } from "../../services/encryption";
 import { DataTable } from "../tables/DataTable";
@@ -30,7 +30,7 @@ const customStyles = {
   }
 };
 
-export class PDataForUserPage extends Component {
+export class PDataPage extends Component {
 
   state = {
     modalIsOpen: false,
@@ -122,4 +122,4 @@ export class PDataForUserPage extends Component {
   }
 }
 
-export const DataForUserPage = connect(mapStateToProps, mapDispatchToProps)(PDataForUserPage)
+export const DataPage = connect(mapStateToProps, mapDispatchToProps)(PDataPage)

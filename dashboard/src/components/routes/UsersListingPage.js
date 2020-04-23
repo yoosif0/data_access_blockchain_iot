@@ -101,4 +101,4 @@ export class PUsersListing extends React.Component {
 }
 
 
-export const UsersListing = connect(mapStateToProps, mapDispatchToProps)(PUsersListing)
+export const UsersListingPage = connect(mapStateToProps, mapDispatchToProps)(PUsersListing)
